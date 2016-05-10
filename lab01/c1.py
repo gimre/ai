@@ -1,5 +1,8 @@
 import unittest
 
+def getMaxKeyAndValue( dict ):
+    return
+
 class C1( ):
     def __init__( self, text ):
         self.text = text
@@ -10,7 +13,18 @@ class C1( ):
         maxLength = max( lengths )
         return words[ lengths.index( maxLength ) ]
 
-    def frequency( self ):
+    def mostFrequentWord( self ):
+        freqMap = self.wordFrequency( )
+        mostFrequent  = max( freqMap.keys( ), key = lambda k: freqMap[ k ] )
+        return ( mostFrequent, freqMap[ mostFrequent ] )
+
+    def mostFrequentNgram( self, length ):
+        return
+
+    def ngramFrequency( self, length ):
+        return { }
+
+    def wordFrequency( self ):
         words   = self.text.split( )
         freqMap = {}
         for word in words:
@@ -24,9 +38,17 @@ class TestLongestWord( unittest.TestCase ):
     def testMultiple( self ):
         self.assertEqual( C1( 'this is a nice text' ).longestWord( ), 'text' )
 
-class TestFrequency( unittest.TestCase ):
+class TestMostFrequent( unittest.TestCase ):
     def testOne( self ):
-        self.assertEqual( C1( 'this is a nice text' ).frequency( ), {
+        self.assertEqual( C1( 'this like is the best like frequency like test' ).mostFrequentWord( ), ( 'like', 3 ) )
+
+class TestNgramFrequency( unittest.TestCase ):
+    def testOne( self ):
+        self.assertEqual( C1( 'abc deabcd cde' ).ngramFrequency( 3 ) )
+
+class TestWordFrequency( unittest.TestCase ):
+    def testOne( self ):
+        self.assertEqual( C1( 'this is a nice text' ).wordFrequency( ), {
             'a': 1,
             'is': 1,
             'nice': 1,
@@ -34,7 +56,7 @@ class TestFrequency( unittest.TestCase ):
             'this': 1
         } )
     def testTwo( self ):
-        self.assertEqual( C1( 'this like is the best like frequency like test' ).frequency( ), {
+        self.assertEqual( C1( 'this like is the best like frequency like test' ).wordFrequency( ), {
             'best': 1,
             'is': 1,
             'frequency': 1,

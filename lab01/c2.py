@@ -39,8 +39,14 @@ class BanquetProblem( BacktrackingProblem ):
         self.classes = classes
         self.results = [ ]
 
+    def first( self, candidate ):
+        pass
+
     def output( self, candidate ):
         self.results.append( candidate )
+
+    def root( self ):
+        return [ ]
 
     def solve( self ):
         super( BanquetProblem, self ).solve( )

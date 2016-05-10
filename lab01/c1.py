@@ -19,7 +19,7 @@ class C1( ):
         return ( mostFrequent, freqMap[ mostFrequent ] )
 
     def mostFrequentNgram( self, length ):
-        return
+        return ( )
 
     def ngramFrequency( self, length ):
         return { }

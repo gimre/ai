@@ -1,66 +1,40 @@
+import backtrack
+import time
 import unittest
 
 
-class BacktrackingProblem( ):
-
-    def accept( self, candidate ):
-        return False
-
-    def first( self, candidate ):
-        return None
-
-    def output( self, candidate ):
-        pass
-
-    def next( self, candidate ):
-        return None
-
-    def reject( self, candidate ):
-        return True
-
-    def root( self ):
-        return None
-
-    def solve( self ):
-        return self.__backtrack( self.root( ) )
-
-    def __backtrack( self, candidate ):
-        if self.reject( candidate ): return
-        if self.accept( candidate ): self.output( candidate )
-        s = self.first( candidate )
-        while s is not None:
-            self.__backtrack( s )
-            s = self.next( s )
+BanquetProblemCandidate = namedtuple( 'BanquetProblemCandidate', [
+    'classes',
+    'students'
+] )
 
 
-class BanquetProblemCandidate(  ):
-    def __init__( self, classes = [ ], students = [ ] ):
-        self.classes  = classes[ : ]
-        self.students = students[ : ]
-
-
-class BanquetProblem( BacktrackingProblem ):
+class BanquetProblem( backtrack.BacktrackingProblem ):
 
     def __init__( self, classes ):
         self.classes = classes
         self.studentCount = sum( [
             boys + girls for boys, girls in self.classes
         ] )
-        self.results = [ ]
 
     def accept( self, candidate ):
         return len( candidate.students ) == self.studentCount
 
-    def first( self, candidate ):
-        if len( candidate.students ) < self.studentCount:
-            return BanquetProblemCandidate(
-                candidate.classes[ : ].append( ( 1, 0 ) ),
-                candidate.students[ : ].append( ( 1, 0, len( self.classes ) + 1 ) )
-            )
+    def first( self, ( classes, students ) ):
         return None
 
     def next( self, candidate ):
-        currentMax = zip( candidate.classes, self.classes )
+        ( classes, students ) = candidate
+        lastIndex = len( classes ) - 1
+        ( isBoy, isGirl, classIndex ) = students[ lastIndex ]
+        ( maxBoys, maxGirls ) = self.classes[ lastIndex ]
+
+        if( current < maxBoys ) {
+            return BanquetProblemCandidate(
+                [ *classes[:-1], (  ) ]
+            )
+        }
+
 
         for i, ( current, max ) in enumerate( currentMax ):
 
@@ -83,26 +57,20 @@ class BanquetProblem( BacktrackingProblem ):
 
         return None
 
-    def output( self, candidate ):
-        self.results.append( candidate )
-
-    def reject( self, candidate ):
-        return False
+    def reject( self, ( classes, students ) ):
+        return len( students ) > self.studentCount
 
     def root( self ):
-        return BanquetProblemCandidate( )
-
-    def solve( self ):
-        super( BanquetProblem, self ).solve( )
-        return self.results
+        return BanquetProblemCandidate( [ ], [ ] )
 
 
-class TestC2( unittest.TestCase ):
+class TestBanquetProblem( unittest.TestCase ):
     def testOne( self ):
-        results = BanquetProblem( [
-            ( 3, 5 ), ( 6, 4 )
-        ] ).solve( )
-        self.assertEqual( results, True )
+        problem = BanquetProblem( [
+            ( 3, 5 ),
+            ( 6, 4 )
+        ] )
+        for solution in problem.solve( ): print( solution )
 
 
 if __name__ == '__main__':

@@ -1,12 +1,9 @@
+from collections import namedtuple
 import backtrack
-import time
 import unittest
 
 
-BanquetProblemCandidate = namedtuple( 'BanquetProblemCandidate', [
-    'classes',
-    'students'
-] )
+Student = namedtuple( 'Student', [ 'isBoy', 'classIndex' ] )
 
 
 class BanquetProblem( backtrack.BacktrackingProblem ):
@@ -18,59 +15,49 @@ class BanquetProblem( backtrack.BacktrackingProblem ):
         ] )
 
     def accept( self, candidate ):
-        return len( candidate.students ) == self.studentCount
+        return len( candidate ) == self.studentCount
 
-    def first( self, ( classes, students ) ):
-        return None
+    def first( self, candidate ):
+        if len( candidate ) == self.studentCount: return None
+        return [ *candidate, Student( True, 0 ) ]
 
     def next( self, candidate ):
-        ( classes, students ) = candidate
-        lastIndex = len( classes ) - 1
-        ( isBoy, isGirl, classIndex ) = students[ lastIndex ]
-        ( maxBoys, maxGirls ) = self.classes[ lastIndex ]
+        student = candidate[-1]
+        if student.isBoy: return [ *candidate[:-1], Student( False, student.classIndex ) ]
+        if student.classIndex == ( len( self.classes ) - 1 ): return None
+        return [ *candidate[:-1], Student( True, student.classIndex + 1 ) ]
 
-        if( current < maxBoys ) {
-            return BanquetProblemCandidate(
-                [ *classes[:-1], (  ) ]
-            )
-        }
-
-
-        for i, ( current, max ) in enumerate( currentMax ):
-
-            ( currentBoys, currentGirls ) = current
-            ( maxBoys, maxGirls )         = max
-
-            if currentBoys < maxBoys:
-                return BanquetProblemCandidate(
-                    [  ].append( ( currentBoys + 1, currentGirls ) )
-                        .append( candidate.classes[ 1: ] ),
-                    candidate.students.append( ( 1, 0, i ) )
-                )
-
-            if currentGirls < maxGirls:
-                return BanquetProblemCandidate(
-                    [  ].append( ( currentBoys, currentGirls + 1 ) )
-                        .append( candidate.classes[ 1: ] ),
-                    candidate.students.append( ( 0, 1, i ) )
-                )
-
-        return None
-
-    def reject( self, ( classes, students ) ):
-        return len( students ) > self.studentCount
+    def reject( self, candidate ):
+        if len( candidate ):
+            for idx, ( maxBoys, maxGirls ) in enumerate( self.classes ):
+                totalBoys = totalGirls = 0
+                students = [ candidate[-1], *candidate, candidate[0] ]
+                for prv, student, nxt in [ students[i-1:i+2] for i in range( 1, len( students ) - 1 ) ]:
+                    if not student.isBoy and ( not prv.isBoy or not nxt.isBoy ): return True
+                    #if prv.classIndex == student.classIndex: return True
+                    if student.classIndex == idx:
+                        totalBoys += ( 1 if student.isBoy else 0 )
+                        totalGirls += ( 1 if not student.isBoy else 0 )
+                if totalBoys > maxBoys or totalGirls > maxGirls: return True
 
     def root( self ):
-        return BanquetProblemCandidate( [ ], [ ] )
+        return [ ]
 
 
 class TestBanquetProblem( unittest.TestCase ):
     def testOne( self ):
         problem = BanquetProblem( [
-            ( 3, 5 ),
-            ( 6, 4 )
+            ( 0, 1 ),
+            ( 1, 0 ),
+            ( 1, 0 )
         ] )
-        for solution in problem.solve( ): print( solution )
+        for solution in problem.solve( ):
+            print( list( map(
+                lambda student: (
+                    'boy' if student.isBoy else 'girl', student.classIndex + 1
+                ),
+                solution
+            ) ) )
 
 
 if __name__ == '__main__':

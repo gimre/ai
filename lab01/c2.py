@@ -33,20 +33,64 @@ class BacktrackingProblem( ):
             s = self.next( s )
 
 
+class BanquetProblemCandidate(  ):
+    def __init__( self, classes = [ ], students = [ ] ):
+        self.classes  = classes[ : ]
+        self.students = students[ : ]
+
+
 class BanquetProblem( BacktrackingProblem ):
 
     def __init__( self, classes ):
         self.classes = classes
+        self.studentCount = sum( [
+            boys + girls for boys, girls in self.classes
+        ] )
         self.results = [ ]
 
+    def accept( self, candidate ):
+        return len( candidate.students ) == self.studentCount
+
     def first( self, candidate ):
-        pass
+        if len( candidate.students ) < self.studentCount:
+            return BanquetProblemCandidate(
+                candidate.classes[ : ].append( ( 1, 0 ) ),
+                candidate.students[ : ].append( ( 1, 0, len( self.classes ) + 1 ) )
+            )
+        return None
+
+    def next( self, candidate ):
+        currentMax = zip( candidate.classes, self.classes )
+
+        for i, ( current, max ) in enumerate( currentMax ):
+
+            ( currentBoys, currentGirls ) = current
+            ( maxBoys, maxGirls )         = max
+
+            if currentBoys < maxBoys:
+                return BanquetProblemCandidate(
+                    [  ].append( ( currentBoys + 1, currentGirls ) )
+                        .append( candidate.classes[ 1: ] ),
+                    candidate.students.append( ( 1, 0, i ) )
+                )
+
+            if currentGirls < maxGirls:
+                return BanquetProblemCandidate(
+                    [  ].append( ( currentBoys, currentGirls + 1 ) )
+                        .append( candidate.classes[ 1: ] ),
+                    candidate.students.append( ( 0, 1, i ) )
+                )
+
+        return None
 
     def output( self, candidate ):
         self.results.append( candidate )
 
+    def reject( self, candidate ):
+        return False
+
     def root( self ):
-        return [ ]
+        return BanquetProblemCandidate( )
 
     def solve( self ):
         super( BanquetProblem, self ).solve( )

@@ -32,9 +32,9 @@ class BanquetProblem( backtrack.BacktrackingProblem ):
             for idx, ( maxBoys, maxGirls ) in enumerate( self.classes ):
                 totalBoys = totalGirls = 0
                 students = [ candidate[-1], *candidate, candidate[0] ]
-                for prv, student, nxt in [ students[i-1:i+2] for i in range( 1, len( students ) - 1 ) ]:
+                for [prv, student, nxt] in [ students[i-1:i+2] for i in range( 1, len( students ) - 1 ) ]:
                     if not student.isBoy and ( not prv.isBoy or not nxt.isBoy ): return True
-                    #if prv.classIndex == student.classIndex: return True
+                    if len( candidate ) > 2 and prv.classIndex == student.classIndex: return True
                     if student.classIndex == idx:
                         totalBoys += ( 1 if student.isBoy else 0 )
                         totalGirls += ( 1 if not student.isBoy else 0 )
@@ -47,8 +47,8 @@ class BanquetProblem( backtrack.BacktrackingProblem ):
 class TestBanquetProblem( unittest.TestCase ):
     def testOne( self ):
         problem = BanquetProblem( [
-            ( 0, 1 ),
-            ( 1, 0 ),
+            ( 3, 1 ),
+            ( 1, 2 ),
             ( 1, 0 )
         ] )
         for solution in problem.solve( ):
